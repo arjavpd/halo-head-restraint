@@ -71,6 +71,11 @@ long getDistance(int trigPin, int echoPin) {
   return cm;
 }
 
+//4 Cases
+//Case 1: Head too far
+//Case 2: Head tilted forward, 
+//Case 2.1: Head Too Low
+//Case 3: Ideal Case  
 void checkDistance(long cmTop, long cmBottom){
   if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
     Serial.print("head too far");
