@@ -7,7 +7,7 @@ const int echoPinBottom = 10;  // Assuming the new sensor is connected to these 
 //the smallest distance from the headrest the head should be at
 const int MINIMUM_SAFE_DISTANCE = 6;
 //the largest head width the sensor will read
-const int MAX_HEAD_WIDTH = 25;
+const int MAX_HEAD_WIDTH = 15;
 
 void setup() {
   // initialize serial communication:
