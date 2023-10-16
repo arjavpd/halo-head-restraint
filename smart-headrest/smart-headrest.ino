@@ -1,12 +1,13 @@
 // these constants won't change. They represent the pin numbers of the sensors' input and output:
 const int trigPinTop = 7;
 const int echoPinTop = 8;
-const int trigPinBottom = 9;   // Assuming the new sensor is connected to these pins
-const int echoPinBottom = 10;  // Assuming the new sensor is connected to these pins
+const int trigPinBottom = 9;   
+const int echoPinBottom = 10;  
 
-//the smallest distance from the headrest the head should be at
+//TODO: adjust the values as needed
+//the smallest distance  from the headrest the head should be at (in centimeters)
 const int MINIMUM_SAFE_DISTANCE = 6;
-//the largest head width the sensor will read
+//the largest head width the sensor will read (in centimeters)
 const int MAX_HEAD_WIDTH = 15;
 
 void setup() {
@@ -93,6 +94,7 @@ void checkDistance(long cmTop, long cmBottom){
   }
 }
 
+//TODO: build out actuator functions 
 void moveCloser(){
   Serial.println();
   Serial.print("moving closer...");
