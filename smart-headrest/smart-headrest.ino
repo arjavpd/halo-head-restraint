@@ -4,6 +4,15 @@ const int echoPinTop = 8;
 const int trigPinBottom = 9;   
 const int echoPinBottom = 10;  
 
+// Left motor
+int enA = 3;
+int in1 = 5;
+int in2 = 4;
+// Right motor
+int enB = 11;
+int in3 = 6;
+int in4 = 13;
+
 //TODO: adjust the values as needed
 //the smallest distance  from the headrest the head should be at (in centimeters)
 const int MINIMUM_SAFE_DISTANCE = 6;
@@ -43,7 +52,7 @@ void loop() {
   checkDistance(cmTop , cmBottom);
 
   Serial.println();
-  delay(100);
+  delay(2000);
 }
 
 long microsecondsToCentimeters(long microseconds) {
@@ -96,17 +105,41 @@ void checkDistance(long cmTop, long cmBottom){
 
 //TODO: build out actuator functions 
 void moveCloser(){
-  Serial.println();
-  Serial.print("moving closer...");
+digitalWrite(in1, LOW);
+digitalWrite(in2, HIGH);
+analogWrite(enA, 200);
+delay(100);
+digitalWrite(in3, LOW);
+digitalWrite(in4, HIGH);
+analogWrite(enB, 200);
+
+Serial.println();
+Serial.print("moving closer...");
 }
 
 void moveUp() {
-  Serial.println();
-  Serial.print("moving up...");
+digitalWrite(in1, LOW);
+digitalWrite(in2, HIGH);
+analogWrite(enA, 400);
+
+digitalWrite(in3, LOW);
+digitalWrite(in4, HIGH);
+analogWrite(enB, 400);
+
+Serial.println();
+Serial.print("moving up...");
 }
 
 void tiltForward() {
-  Serial.println();
-  Serial.print("tilting forward...");
+  digitalWrite(in1, LOW);
+digitalWrite(in2, HIGH);
+analogWrite(enA, 400);
+
+digitalWrite(in3, LOW);
+digitalWrite(in4, HIGH);
+analogWrite(enB, 400);
+
+Serial.println();
+Serial.print("tilting forward...");
 }
 
