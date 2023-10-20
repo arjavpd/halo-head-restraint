@@ -4,7 +4,8 @@ const int echoPinTop = 8;
 const int trigPinBottom = 9;   
 const int echoPinBottom = 10;  
 
-//TODO: adjust the values as needed
+//TODO: adjust the values as needed 
+//Add comment! 
 //the smallest distance  from the headrest the head should be at (in centimeters)
 const int MINIMUM_SAFE_DISTANCE = 6;
 //the largest head width the sensor will read (in centimeters)
@@ -43,7 +44,7 @@ void loop() {
   checkDistance(cmTop , cmBottom);
 
   Serial.println();
-  delay(100);
+  delay(1500);
 }
 
 long microsecondsToCentimeters(long microseconds) {
@@ -84,7 +85,7 @@ void checkDistance(long cmTop, long cmBottom){
   } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom <= MINIMUM_SAFE_DISTANCE) {
     if (cmTop > MAX_HEAD_WIDTH) {
       Serial.print("head too low");
-      moveUp();
+      moveDown();
     } else {
       Serial.print("head tilted too far forward");
       tiltForward();
@@ -100,9 +101,9 @@ void moveCloser(){
   Serial.print("moving closer...");
 }
 
-void moveUp() {
+void moveDown() {
   Serial.println();
-  Serial.print("moving up...");
+  Serial.print("moving down...");
 }
 
 void tiltForward() {
