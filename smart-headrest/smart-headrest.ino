@@ -1,13 +1,24 @@
 // these constants won't change. They represent the pin numbers of the sensors' input and output:
-const int trigPinTop = 7;
-const int echoPinTop = 8;
-const int trigPinBottom = 9;   
-const int echoPinBottom = 10;  
+const int trigPinTop = 13;
+const int echoPinTop = 12;
+const int trigPinBottom = 11;   
+const int echoPinBottom = 10; 
 
+
+// Left motor
+int enA = 3;
+int in1 = 5;
+int in2 = 4;
+// Right motor
+int enB = 6;
+int in3 = 9;
+int in4 = 8;
+
+//TODO: adjust the values as needed
 //TODO: adjust the values as needed 
 //Add comment! 
 //the smallest distance  from the headrest the head should be at (in centimeters)
-const int MINIMUM_SAFE_DISTANCE = 6;
+const int MINIMUM_SAFE_DISTANCE = 10;
 //the largest head width the sensor will read (in centimeters)
 const int MAX_HEAD_WIDTH = 15;
 
@@ -44,7 +55,7 @@ void loop() {
   checkDistance(cmTop , cmBottom);
 
   Serial.println();
-  delay(1500);
+  delay(2000);
 }
 
 long microsecondsToCentimeters(long microseconds) {
@@ -90,24 +101,88 @@ void checkDistance(long cmTop, long cmBottom){
       Serial.print("head tilted too far forward");
       tiltForward();
     }
-  } else {
+  } else if (cmTop <  MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
+    moveBackward();
+
+  } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
+    tiltForward();
+
+  } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
+    tiltBack();
+  }
+  else {
     Serial.print("head in ideal position");
   }
 }
 
-//TODO: build out actuator functions 
 void moveCloser(){
-  Serial.println();
-  Serial.print("moving closer...");
+digitalWrite(in1, LOW);
+digitalWrite(in2, HIGH);
+analogWrite(enA, 200);
+delay(100);
+digitalWrite(in3, LOW);
+digitalWrite(in4, HIGH);
+analogWrite(enB, 200);
+
+Serial.println();
+Serial.print("moving closer...");
 }
 
 void moveDown() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, 400);
+
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  analogWrite(enB, 400);
+
   Serial.println();
   Serial.print("moving down...");
 }
 
-void tiltForward() {
-  Serial.println();
-  Serial.print("tilting forward...");
+void moveBackward(){
+digitalWrite(in1, HIGH);
+digitalWrite(in2, LOW);
+analogWrite(enA, 200);
+delay(100);
+digitalWrite(in3, HIGH);
+digitalWrite(in4, LOW);
+analogWrite(enB, 200);
+
+Serial.println();
+Serial.print("moving farther...");
 }
+
+void moveUp() {
+Serial.println();
+Serial.print("moving up...");
+}
+
+void tiltForward() {
+digitalWrite(in1, LOW);
+digitalWrite(in2, LOW);
+analogWrite(enA, 200);
+
+digitalWrite(in3, HIGH);
+digitalWrite(in4, LOW);
+analogWrite(enB, 200);
+
+Serial.println();
+Serial.print("tilting forward...");
+}
+
+void tiltBack() {
+digitalWrite(in1, HIGH);
+digitalWrite(in2, LOW);
+analogWrite(enA, 200);
+
+digitalWrite(in3, LOW);
+digitalWrite(in4, LOW);
+analogWrite(enB, 200);
+
+Serial.println();
+Serial.print("tilting backward...");
+}
+
 
