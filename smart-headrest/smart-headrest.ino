@@ -1,8 +1,8 @@
 // these constants won't change. They represent the pin numbers of the sensors' input and output:
 const int trigPinTop = 13;
 const int echoPinTop = 12;
-const int trigPinBottom = 11;   
-const int echoPinBottom = 10; 
+const int trigPinBottom = 11;
+const int echoPinBottom = 10;
 
 
 // Left motor
@@ -15,8 +15,8 @@ int in3 = 9;
 int in4 = 8;
 
 //TODO: adjust the values as needed
-//TODO: adjust the values as needed 
-//Add comment! 
+//TODO: adjust the values as needed
+//Add comment!
 //the smallest distance  from the headrest the head should be at (in centimeters)
 const int MINIMUM_SAFE_DISTANCE = 10;
 //the largest head width the sensor will read (in centimeters)
@@ -52,7 +52,7 @@ void loop() {
   // Serial.println();
   // Serial.println();
 
-  checkDistance(cmTop , cmBottom);
+  checkDistance(cmTop, cmBottom);
 
   Serial.println();
   delay(2000);
@@ -86,10 +86,10 @@ long getDistance(int trigPin, int echoPin) {
 
 //4 Cases
 //Case 1: Head too far
-//Case 2: Head tilted forward, 
+//Case 2: Head tilted forward,
 //Case 2.1: Head Too Low
-//Case 3: Ideal Case  
-void checkDistance(long cmTop, long cmBottom){
+//Case 3: Ideal Case
+void checkDistance(long cmTop, long cmBottom) {
   if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
     Serial.print("head too far");
     moveCloser();
@@ -101,7 +101,7 @@ void checkDistance(long cmTop, long cmBottom){
       Serial.print("head tilted too far forward");
       tiltForward();
     }
-  } else if (cmTop <  MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
+  } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
     moveBackward();
 
   } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
@@ -109,23 +109,22 @@ void checkDistance(long cmTop, long cmBottom){
 
   } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
     tiltBack();
-  }
-  else {
+  } else {
     Serial.print("head in ideal position");
   }
 }
 
-void moveCloser(){
-digitalWrite(in1, LOW);
-digitalWrite(in2, HIGH);
-analogWrite(enA, 200);
-delay(100);
-digitalWrite(in3, LOW);
-digitalWrite(in4, HIGH);
-analogWrite(enB, 200);
+void moveCloser() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, 200);
+  delay(100);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  analogWrite(enB, 200);
 
-Serial.println();
-Serial.print("moving closer...");
+  Serial.println();
+  Serial.print("moving closer...");
 }
 
 void moveDown() {
@@ -141,48 +140,46 @@ void moveDown() {
   Serial.print("moving down...");
 }
 
-void moveBackward(){
-digitalWrite(in1, HIGH);
-digitalWrite(in2, LOW);
-analogWrite(enA, 200);
-delay(100);
-digitalWrite(in3, HIGH);
-digitalWrite(in4, LOW);
-analogWrite(enB, 200);
+void moveBackward() {
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 200);
+  delay(100);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, 200);
 
-Serial.println();
-Serial.print("moving farther...");
+  Serial.println();
+  Serial.print("moving farther...");
 }
 
 void moveUp() {
-Serial.println();
-Serial.print("moving up...");
+  Serial.println();
+  Serial.print("moving up...");
 }
 
 void tiltForward() {
-digitalWrite(in1, LOW);
-digitalWrite(in2, LOW);
-analogWrite(enA, 200);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 200);
 
-digitalWrite(in3, HIGH);
-digitalWrite(in4, LOW);
-analogWrite(enB, 200);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, 200);
 
-Serial.println();
-Serial.print("tilting forward...");
+  Serial.println();
+  Serial.print("tilting forward...");
 }
 
 void tiltBack() {
-digitalWrite(in1, HIGH);
-digitalWrite(in2, LOW);
-analogWrite(enA, 200);
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 200);
 
-digitalWrite(in3, LOW);
-digitalWrite(in4, LOW);
-analogWrite(enB, 200);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, 200);
 
-Serial.println();
-Serial.print("tilting backward...");
+  Serial.println();
+  Serial.print("tilting backward...");
 }
-
-
