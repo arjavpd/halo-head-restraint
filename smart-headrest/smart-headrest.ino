@@ -14,11 +14,13 @@ int enB = 6;
 int in3 = 9;
 int in4 = 8;
 
-//TODO: adjust the values as needed
-//TODO: adjust the values as needed
-//Add comment!
+const int trigPinTop = 7;
+const int echoPinTop = 8;
+const int trigPinBottom = 9;   
+const int echoPinBottom = 10;  
+
 //the smallest distance  from the headrest the head should be at (in centimeters)
-const int MINIMUM_SAFE_DISTANCE = 10;
+const int MINIMUM_SAFE_DISTANCE = 6;
 //the largest head width the sensor will read (in centimeters)
 const int MAX_HEAD_WIDTH = 15;
 
@@ -55,7 +57,7 @@ void loop() {
   checkDistance(cmTop, cmBottom);
 
   Serial.println();
-  delay(2000);
+  delay(1500);
 }
 
 long microsecondsToCentimeters(long microseconds) {
@@ -103,16 +105,15 @@ void checkDistance(long cmTop, long cmBottom) {
     }
   } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
     moveBackward();
-
   } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
     tiltForward();
-
   } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
     tiltBack();
   } else {
     Serial.print("head in ideal position");
   }
 }
+
 
 void moveCloser() {
   digitalWrite(in1, LOW);
@@ -128,14 +129,6 @@ void moveCloser() {
 }
 
 void moveDown() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(enA, 400);
-
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(enB, 400);
-
   Serial.println();
   Serial.print("moving down...");
 }
@@ -182,4 +175,9 @@ void tiltBack() {
 
   Serial.println();
   Serial.print("tilting backward...");
+}
+
+void tiltForward() {
+  Serial.println();
+  Serial.print("tilting forward...");
 }
