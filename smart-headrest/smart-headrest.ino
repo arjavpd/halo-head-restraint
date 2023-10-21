@@ -14,10 +14,6 @@ int enB = 6;
 int in3 = 9;
 int in4 = 8;
 
-const int trigPinTop = 7;
-const int echoPinTop = 8;
-const int trigPinBottom = 9;   
-const int echoPinBottom = 10;  
 
 //the smallest distance  from the headrest the head should be at (in centimeters)
 const int MINIMUM_SAFE_DISTANCE = 6;
@@ -92,30 +88,34 @@ long getDistance(int trigPin, int echoPin) {
 //Case 2.1: Head Too Low
 //Case 3: Ideal Case
 void checkDistance(long cmTop, long cmBottom) {
-  if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
-    Serial.print("head too far");
-    moveCloser();
-  } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom <= MINIMUM_SAFE_DISTANCE) {
-    if (cmTop > MAX_HEAD_WIDTH) {
-      Serial.print("head too low");
-      moveDown();
+  if (cmTop > MINIMUM_SAFE_DISTANCE) {
+    if (cmBottom > MINIMUM_SAFE_DISTANCE) {
+      Serial.print("head too far");
+      moveForward();
     } else {
-      Serial.print("head tilted too far forward");
-      tiltForward();
+      if (cmTop > MAX_HEAD_WIDTH) {
+        Serial.print("head too low");
+        moveDown();
+      } else {
+        Serial.print("head tilted too far forward");
+        tiltForward();
+      }
     }
-  } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
-    moveBackward();
-  } else if (cmTop > MINIMUM_SAFE_DISTANCE && cmBottom < MINIMUM_SAFE_DISTANCE) {
-    tiltForward();
-  } else if (cmTop < MINIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE) {
-    tiltBack();
   } else {
-    Serial.print("head in ideal position");
+    if (cmBottom > MINIMUM_SAFE_DISTANCE) {
+      Serial.print("head tilted too close");
+      tiltBack();
+    } else if (cmBottom < MINIMUM_SAFE_DISTANCE) {
+      Serial.print("head too close");
+      moveBackward();
+    } else {
+      Serial.print("head in ideal position");
+    }
   }
 }
 
 
-void moveCloser() {
+void moveForward() {
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   analogWrite(enA, 200);
@@ -125,7 +125,7 @@ void moveCloser() {
   analogWrite(enB, 200);
 
   Serial.println();
-  Serial.print("moving closer...");
+  Serial.print("moving forward...");
 }
 
 void moveDown() {
@@ -143,7 +143,7 @@ void moveBackward() {
   analogWrite(enB, 200);
 
   Serial.println();
-  Serial.print("moving farther...");
+  Serial.print("moving backwards...");
 }
 
 void moveUp() {
@@ -175,9 +175,4 @@ void tiltBack() {
 
   Serial.println();
   Serial.print("tilting backward...");
-}
-
-void tiltForward() {
-  Serial.println();
-  Serial.print("tilting forward...");
 }
