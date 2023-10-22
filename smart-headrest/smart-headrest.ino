@@ -16,7 +16,9 @@ int in4 = 8;
 
 
 //the smallest distance  from the headrest the head should be at (in centimeters)
-const int MINIMUM_SAFE_DISTANCE = 6;
+const int MINIMUM_SAFE_DISTANCE = 5;
+//the largest distance from the headrest that head should be at (in centimeters)
+const int MAXIMUM_SAFE_DISTANCE = 10;
 //the largest head width the sensor will read (in centimeters)
 const int MAX_HEAD_WIDTH = 15;
 
@@ -83,12 +85,15 @@ long getDistance(int trigPin, int echoPin) {
 }
 
 //4 Cases
-//Case 1: Head too far
-//Case 2: Head tilted forward,
-//Case 2.1: Head Too Low
-//Case 3: Ideal Case
+//Case 1: head is in safety range
+
 void checkDistance(long cmTop, long cmBottom) {
-  if (cmTop > MINIMUM_SAFE_DISTANCE) {
+  //Case 1: head is in safety range
+  if (cmTop > MINIMUM_SAFE_DISTANCE && cmTop < MAXIMUM_SAFE_DISTANCE && cmBottom > MINIMUM_SAFE_DISTANCE && cmBottom < MAXIMUM_SAFE_DISTANCE) {
+    Serial.print("head is good ");
+    doNothing();
+  }
+  else if (cmTop > MINIMUM_SAFE_DISTANCE) {
     if (cmBottom > MINIMUM_SAFE_DISTANCE) {
       Serial.print("head too far");
       moveForward();
@@ -101,15 +106,14 @@ void checkDistance(long cmTop, long cmBottom) {
         tiltForward();
       }
     }
-  } else {
+  }
+  else {
     if (cmBottom > MINIMUM_SAFE_DISTANCE) {
       Serial.print("head tilted too close");
       tiltBack();
     } else if (cmBottom < MINIMUM_SAFE_DISTANCE) {
       Serial.print("head too close");
       moveBackward();
-    } else {
-      Serial.print("head in ideal position");
     }
   }
 }
@@ -175,4 +179,17 @@ void tiltBack() {
 
   Serial.println();
   Serial.print("tilting backward...");
+}
+
+void doNothing() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 200);
+
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, 200);
+
+  Serial.println();
+  Serial.print("do nothing...");
 }
