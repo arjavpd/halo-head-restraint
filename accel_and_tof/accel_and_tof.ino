@@ -30,6 +30,8 @@ runmode_t run_mode = RUN_MODE_DEFAULT;
 const int MIN_DIST = 50;
 // ADDED - MAXIMUM SAFE DISTANCE (mm)
 const int MAX_DIST = 100;
+const int XmaxExtension = 190;
+const int YmaxExtension = 100;
 // ADDED - DISTANCE OF THE FIRST SENSOR (mm)
 int ONE_DIST;
 // ADDED - DISTANCE OF THE SECOND SENSOR (mm)
@@ -263,13 +265,15 @@ void checkPosition() {
 
       //bottom sensor detects nothing
       if (THREE_DIST == 1000) {
-        Serial.print("MOVE FORWARD");
+        Serial.print("MOVE FORWARD ");
+        Serial.print(XmaxExtension);
         Serial.println();
       }
 
       //bottom sensor detects a head
       else {
-        Serial.print("MOVE DOWN");
+        Serial.print("Y RETRACT ");
+        Serial.print(YmaxExtension);
         Serial.println();
       }
     }
@@ -281,63 +285,67 @@ void checkPosition() {
 
       //the middle sensor is in range
       if (TWO_DIST > MIN_DIST && TWO_DIST < MAX_DIST) {
+        Serial.print("CORRECT DISTANCE");
 
-        //the bottom sensor is in range
-        if (THREE_DIST > MIN_DIST && THREE_DIST < MAX_DIST) {
-          Serial.print("CORRECT DISTANCE & TILT");
-          Serial.println();
-        }
-
-        //the bottom sensor is too close
-        else if (THREE_DIST < MIN_DIST) {
-          Serial.print("TILT FORWARD");
-          Serial.println();
-        }
-
-        //the bottom sensor is too far
-        else {
-          Serial.print("TILT BACK");
-          Serial.println();
-        }
+//        //the bottom sensor is in range
+//        if (THREE_DIST > MIN_DIST && THREE_DIST < MAX_DIST) {
+//          Serial.print("CORRECT DISTANCE & TILT");
+//          Serial.println();
+//        }
+//
+//        //the bottom sensor is too close
+//        else if (THREE_DIST < MIN_DIST) {
+//          Serial.print("TILT FORWARD");
+//          Serial.println();
+//        }
+//
+//        //the bottom sensor is too far
+//        else {
+//          Serial.print("TILT BACK");
+//          Serial.println();
+//        }
       }
 
       //the middle sensor is too close
       else if (TWO_DIST < MIN_DIST) {
 
-        //the bottom sensor is too close
-        if (THREE_DIST < MIN_DIST) {
-          Serial.print("MOVE BACK");
+//        //the bottom sensor is too close
+//        if (THREE_DIST < MIN_DIST) {
+          Serial.print("X RETRACT ");
+          Serial.print(MIN_DIST - TWO_DIST);
           Serial.println();
-        }
+//        }
 
-        //the bottom sensor is in range
-        else {
-          Serial.print("TILT BACK");
-          Serial.println();
-        }
+//        //the bottom sensor is in range
+//        else {
+//          Serial.print("TILT BACK");
+//          Serial.println();
+//        }
       }
 
       //the middle sensor is too far
       else {
 
-        //the bottom sensor is too far
-        if (THREE_DIST > MAX_DIST) {
-          Serial.print("MOVE FORWARD");
+//        //the bottom sensor is too far
+//        if (THREE_DIST > MAX_DIST) {
+          Serial.print("X EXTEND ");
+          Serial.print(TWO_DIST - MAX_DIST);
           Serial.println();
-        }
+//        }
 
-        //the bottom sensor is in range
-        else {
-          Serial.print("TILT FORWARD");
-          Serial.println();
-        }
+//        //the bottom sensor is in range
+//        else {
+//          Serial.print("TILT FORWARD");
+//          Serial.println();
+//        }
       }
     }
   }
 
   //top sensor detects a head
   else if (ONE_DIST != 1000) {
-    Serial.print("MOVE UP");
+    Serial.print("Y EXTEND ");
+    Serial.print(YmaxExtension/2);
     Serial.println();
   }
 }
