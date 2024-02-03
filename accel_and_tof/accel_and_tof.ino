@@ -9,15 +9,18 @@ Adafruit_MPU6050 mpu;
 #define LOX1_ADDRESS 0x30
 #define LOX2_ADDRESS 0x31
 #define LOX3_ADDRESS 0x32
+#define LOX4_ADDRESS 0x33
 
 // set the pins to shutdown
 #define SHT_LOX1 27
 #define SHT_LOX2 26
 #define SHT_LOX3 25
+#define SHT_LOX4 13
 
 Adafruit_VL6180X lox1 = Adafruit_VL6180X();
 Adafruit_VL6180X lox2 = Adafruit_VL6180X();
 Adafruit_VL6180X lox3 = Adafruit_VL6180X();
+Adafruit_VL6180X lox4 = Adafruit_VL6180X();
 
 // Setup mode for doing reads
 typedef enum {RUN_MODE_DEFAULT} runmode_t;
@@ -33,6 +36,8 @@ int ONE_DIST;
 int TWO_DIST;
 // ADDED - DISTANCE OF THE THIRD SENSOR (mm)
 int THREE_DIST;
+// ADDED - DISTANCE OF THE REAR SENSOR (mm)
+int REAR_DIST;
 
 void setID() {
   // initializing MPU6050
@@ -55,18 +60,21 @@ void setID() {
   digitalWrite(SHT_LOX1, LOW);
   digitalWrite(SHT_LOX2, LOW);
   digitalWrite(SHT_LOX3, LOW);
+  digitalWrite(SHT_LOX4, LOW);
   delay(10);
 
   // all unreset
   digitalWrite(SHT_LOX1, HIGH);
   digitalWrite(SHT_LOX2, HIGH);
   digitalWrite(SHT_LOX3, HIGH);
+  digitalWrite(SHT_LOX4, HIGH);
   delay(10);
 
   // activating LOX1 and reseting LOX2
   digitalWrite(SHT_LOX1, HIGH);
   digitalWrite(SHT_LOX2, LOW);
   digitalWrite(SHT_LOX3, LOW);
+  digitalWrite(SHT_LOX4, LOW);
 
   // initing LOX1
   if (!lox1.begin()) {
@@ -97,6 +105,17 @@ void setID() {
     while (1);
   }
   lox3.setAddress(LOX3_ADDRESS);
+
+  // activating LOX4
+  digitalWrite(SHT_LOX4, HIGH);
+  delay(10);
+
+  //initing LOX4
+  if (!lox4.begin()) {
+    Serial.println(F("Failed to boot fourth VL6180X"));
+    while (1);
+  }
+  lox4.setAddress(LOX4_ADDRESS);
 }
 
 void readMPU6050() {
@@ -148,7 +167,39 @@ void readSensor(Adafruit_VL6180X &vl) {
     if (vl.getAddress() == 0x32) {
       THREE_DIST = range;
     }
+    if (vl.getAddress() == 0x33) {
+      REAR_DIST = range;
+    }
   }
+
+    //if top sensor detects nothing, give it a distinct value
+  else if (vl.getAddress() == 0x30) {
+    ONE_DIST = 1000;
+    Serial.print(" NO HEAD DETECTED");
+    Serial.println();
+  }
+
+  //if middle sensor detects nothing, give it a distinct value
+  else if (vl.getAddress() == 0x31) {
+    TWO_DIST = 1000;
+    Serial.print(" NO HEAD DETECTED");
+    Serial.println();
+  }
+
+  //if bottom sensor detects nothing, give it a distinct value
+  else if (vl.getAddress() == 0x32) {
+    THREE_DIST = 1000;
+    Serial.print(" NO HEAD DETECTED");
+    Serial.println();
+  }
+
+  //if rear sensor detects nothing, give it a distinct value
+  else if (vl.getAddress() == 0x33) {
+    REAR_DIST = 1000;
+    Serial.print(" NO OBJECT DETECTED");
+    Serial.println();
+  }
+
 }
 
 void read_sensors() {
@@ -156,6 +207,7 @@ void read_sensors() {
   readSensor(lox1);
   readSensor(lox2);
   readSensor(lox3);
+  readSensor(lox4);
   Serial.println();
 
   checkPosition();
@@ -260,12 +312,14 @@ void setup() {
   pinMode(SHT_LOX1, OUTPUT);
   pinMode(SHT_LOX2, OUTPUT);
   pinMode(SHT_LOX3, OUTPUT);
+  pinMode(SHT_LOX4, OUTPUT);
 
   Serial.println("Shutdown pins inited...");
 
   digitalWrite(SHT_LOX1, LOW);
   digitalWrite(SHT_LOX2, LOW);
   digitalWrite(SHT_LOX3, LOW);
+  digitalWrite(SHT_LOX4, LOW);
   Serial.println("All in reset mode...(pins are low)");
 
   Serial.println("Starting...");
@@ -274,5 +328,5 @@ void setup() {
 
 void loop() {
   read_sensors();
-  delay(5000);
+  delay(1000);
 }
