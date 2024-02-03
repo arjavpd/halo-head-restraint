@@ -37,7 +37,13 @@ int TWO_DIST;
 // ADDED - DISTANCE OF THE THIRD SENSOR (mm)
 int THREE_DIST;
 // ADDED - DISTANCE OF THE REAR SENSOR (mm)
-int REAR_DIST;
+int REAR_DIST = 1000;
+// REAR DISTANCE TO DETECT CRASH
+const int safetyDistance = 150;
+
+int accel;
+const int safetyAccel = 0;
+
 
 void setID() {
   // initializing MPU6050
@@ -118,9 +124,54 @@ void setID() {
   lox4.setAddress(LOX4_ADDRESS);
 }
 
+void setup() {
+  Serial.begin(115200);
+
+  while (!Serial) {
+    delay(1);
+  }
+
+  pinMode(SHT_LOX1, OUTPUT);
+  pinMode(SHT_LOX2, OUTPUT);
+  pinMode(SHT_LOX3, OUTPUT);
+  pinMode(SHT_LOX4, OUTPUT);
+
+  Serial.println("Shutdown pins inited...");
+
+  digitalWrite(SHT_LOX1, LOW);
+  digitalWrite(SHT_LOX2, LOW);
+  digitalWrite(SHT_LOX3, LOW);
+  digitalWrite(SHT_LOX4, LOW);
+  Serial.println("All in reset mode...(pins are low)");
+
+  Serial.println("Starting...");
+  setID();
+}
+
+void loop() {
+  readSensor(lox4);
+  if (REAR_DIST <= safetyDistance){
+    readMPU6050();
+    if (accel >= safetyAccel){
+      headPosition();
+      checkPosition();
+    }
+  }
+  delay(10);
+}
+
+void headPosition() {
+  readSensor(lox1);
+  readSensor(lox2);
+  readSensor(lox3);
+  Serial.println();
+}
+
 void readMPU6050() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+
+  accel = a.acceleration.x;
 
   Serial.print("Acceleration X: ");
   Serial.print(a.acceleration.x);
@@ -200,17 +251,6 @@ void readSensor(Adafruit_VL6180X &vl) {
     Serial.println();
   }
 
-}
-
-void read_sensors() {
-  readMPU6050();
-  readSensor(lox1);
-  readSensor(lox2);
-  readSensor(lox3);
-  readSensor(lox4);
-  Serial.println();
-
-  checkPosition();
 }
 
 void checkPosition() {
@@ -300,33 +340,4 @@ void checkPosition() {
     Serial.print("MOVE UP");
     Serial.println();
   }
-}
-
-void setup() {
-  Serial.begin(115200);
-
-  while (!Serial) {
-    delay(1);
-  }
-
-  pinMode(SHT_LOX1, OUTPUT);
-  pinMode(SHT_LOX2, OUTPUT);
-  pinMode(SHT_LOX3, OUTPUT);
-  pinMode(SHT_LOX4, OUTPUT);
-
-  Serial.println("Shutdown pins inited...");
-
-  digitalWrite(SHT_LOX1, LOW);
-  digitalWrite(SHT_LOX2, LOW);
-  digitalWrite(SHT_LOX3, LOW);
-  digitalWrite(SHT_LOX4, LOW);
-  Serial.println("All in reset mode...(pins are low)");
-
-  Serial.println("Starting...");
-  setID();
-}
-
-void loop() {
-  read_sensors();
-  delay(1000);
 }
