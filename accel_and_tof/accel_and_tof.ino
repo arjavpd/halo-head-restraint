@@ -33,7 +33,7 @@ const int MAX_SAFE_DIST = 100;
 
 // MAX Extension DISTANCE (mm)
 const int X_MAX_EXTENSION = 190;
-const int Y_MAX_EXTENSION = 100;
+const int Y_MAX_EXTENSION = 60;
 
 // MIN ACCELERATION VALUE TO DETECT CRASH
 const int SAFETY_ACCEL = 0;
@@ -55,6 +55,11 @@ int rearObjDist = 1000;
 // ACCELERATION (m/s^2)
 int accel;
 
+#define Y_MOTOR_ENA 2          // enables the motor
+#define Y_MOTOR_DIR 4          // determines the direction
+#define Y_MOTOR_PUL 5        // executes a step
+const int motorPulseInterval = 350;  // interval between pulse state changes
+
 void setup() {
   Serial.begin(115200);
 
@@ -75,6 +80,13 @@ void setup() {
   digitalWrite(SHT_LOX4, LOW);
   Serial.println("All in reset mode...(pins are low)");
 
+  //Y MOTOR SET UP 
+  pinMode(Y_MOTOR_ENA, OUTPUT);
+  pinMode(Y_MOTOR_DIR, OUTPUT);
+  pinMode(Y_MOTOR_PUL, OUTPUT);
+  digitalWrite(Y_MOTOR_ENA, LOW);   // enable in inverted low
+  digitalWrite(Y_MOTOR_PUL, HIGH);  // falling edge
+
   Serial.println("Starting...");
   setID();
 }
@@ -92,7 +104,7 @@ void loop() {
       processHeadPosition();
     }
   }
-  delay(10);
+  delay(1000); //adjust this delay to change the speed of the whole system loop 
 }
 
 void senseHeadPosition() {
@@ -220,6 +232,7 @@ void processHeadPosition() {
         Serial.print(Y_MAX_EXTENSION);
         Serial.println(" mm");
         Serial.println();
+        actuateY(false, Y_MAX_EXTENSION);
       }
     }
 
@@ -258,6 +271,7 @@ void processHeadPosition() {
     Serial.print(Y_MAX_EXTENSION / 2);
     Serial.println(" mm");
     Serial.println();
+    actuateY(true, Y_MAX_EXTENSION / 2);
   }
 }
 
@@ -345,3 +359,19 @@ void setID() {
   lox4.setAddress(LOX4_ADDRESS);
 }
 
+//MOTOR Settings
+//Microstep: 4
+//Pulse/rev: 800
+void actuateY(bool extend, int distance) {
+  boolean motorPulseState = LOW;        // pulse state
+  //TODO: figure out formula to convert distance to Steps
+  int pulses = round((static_cast<float>(distance) / 60.0) * 800); //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
+  // Set the direction based on the extend parameter
+  digitalWrite(Y_MOTOR_DIR, extend ? LOW : HIGH);  // LOW for extending (CW), HIGH for retracting (CCW)
+
+  for (int i = 0; i < pulses; i++) {
+    motorPulseState = !motorPulseState;            // inverts the state of the variable
+    digitalWrite(Y_MOTOR_PUL, motorPulseState);  // assigns the new state to the port
+    delayMicroseconds(motorPulseInterval);
+  }
+}
