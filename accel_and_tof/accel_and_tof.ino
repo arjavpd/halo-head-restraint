@@ -32,7 +32,7 @@ const int MIN_SAFE_DIST = 50;
 const int MAX_SAFE_DIST = 100;
 
 // MAX Extension DISTANCE (mm)
-const int X_MAX_EXTENSION = 190;
+const int X_MAX_EXTENSION = 100;
 const int Y_MAX_EXTENSION = 60;
 
 // MIN ACCELERATION VALUE TO DETECT CRASH
@@ -55,9 +55,14 @@ int rearObjDist = 1000;
 // ACCELERATION (m/s^2)
 int accel;
 
+#define X_MOTOR_ENA 15          // enables the motor
+#define X_MOTOR_DIR 18          // determines the direction
+#define X_MOTOR_PUL 19        // executes a step
+
 #define Y_MOTOR_ENA 2          // enables the motor
 #define Y_MOTOR_DIR 4          // determines the direction
 #define Y_MOTOR_PUL 5        // executes a step
+
 const int motorPulseInterval = 350;  // interval between pulse state changes
 
 void setup() {
@@ -79,6 +84,13 @@ void setup() {
   digitalWrite(SHT_LOX3, LOW);
   digitalWrite(SHT_LOX4, LOW);
   Serial.println("All in reset mode...(pins are low)");
+
+  //X MOTOR SET UP 
+  pinMode(X_MOTOR_ENA, OUTPUT);
+  pinMode(X_MOTOR_DIR, OUTPUT);
+  pinMode(X_MOTOR_PUL, OUTPUT);
+  digitalWrite(X_MOTOR_ENA, LOW);   // enable in inverted low
+  digitalWrite(X_MOTOR_PUL, HIGH);  // falling edge
 
   //Y MOTOR SET UP 
   pinMode(Y_MOTOR_ENA, OUTPUT);
@@ -224,6 +236,7 @@ void processHeadPosition() {
         Serial.print(X_MAX_EXTENSION);
         Serial.println(" mm");
         Serial.println();
+        actuateX(true, X_MAX_EXTENSION);
       }
 
       //bottom sensor detects a head
@@ -253,6 +266,7 @@ void processHeadPosition() {
         Serial.print(MIN_SAFE_DIST - middleSensorDist);
         Serial.println(" mm");
         Serial.println();
+        actuateX(false, MIN_SAFE_DIST - middleSensorDist);
       }
 
       //the middle sensor is too far
@@ -261,6 +275,7 @@ void processHeadPosition() {
         Serial.print(middleSensorDist - MAX_SAFE_DIST);
         Serial.println(" mm");
         Serial.println();
+        actuateX(true, middleSensorDist - MAX_SAFE_DIST);
       }
     }
   }
@@ -362,9 +377,24 @@ void setID() {
 //MOTOR Settings
 //Microstep: 4
 //Pulse/rev: 800
+void actuateX(bool extend, int distance) {
+  boolean motorPulseState = LOW;        // pulse state
+  int pulses = round((static_cast<float>(distance) / 60.0) * 800); //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
+  // Set the direction based on the extend parameter
+  digitalWrite(X_MOTOR_DIR, extend ? LOW : HIGH);  // LOW for extending (CW), HIGH for retracting (CCW)
+
+  for (int i = 0; i < pulses; i++) {
+    motorPulseState = !motorPulseState;            // inverts the state of the variable
+    digitalWrite(X_MOTOR_PUL, motorPulseState);  // assigns the new state to the port
+    delayMicroseconds(motorPulseInterval);
+  }
+}
+
+//MOTOR Settings
+//Microstep: 4
+//Pulse/rev: 800
 void actuateY(bool extend, int distance) {
   boolean motorPulseState = LOW;        // pulse state
-  //TODO: figure out formula to convert distance to Steps
   int pulses = round((static_cast<float>(distance) / 60.0) * 800); //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
   // Set the direction based on the extend parameter
   digitalWrite(Y_MOTOR_DIR, extend ? LOW : HIGH);  // LOW for extending (CW), HIGH for retracting (CCW)
