@@ -5,26 +5,29 @@
 
 Adafruit_MPU6050 mpu;
 
+//LIDAR I2C PINS
 // address we will assign if dual sensor is present
 #define LOX1_ADDRESS 0x30
 #define LOX2_ADDRESS 0x31
 #define LOX3_ADDRESS 0x32
 #define LOX4_ADDRESS 0x33
 
+//LIDAR SHUTDOWN PINS
 // set the pins to shutdown
 #define SHT_LOX1 27
 #define SHT_LOX2 26
 #define SHT_LOX3 25
 #define SHT_LOX4 13
 
-Adafruit_VL6180X lox1 = Adafruit_VL6180X();
-Adafruit_VL6180X lox2 = Adafruit_VL6180X();
-Adafruit_VL6180X lox3 = Adafruit_VL6180X();
-Adafruit_VL6180X lox4 = Adafruit_VL6180X();
+//X MOTOR PINS
+#define X_MOTOR_ENA 15  // enables the motor
+#define X_MOTOR_DIR 18  // determines the direction
+#define X_MOTOR_PUL 19  // executes a step
 
-// Setup mode for doing reads
-typedef enum { RUN_MODE_DEFAULT } runmode_t;
-runmode_t run_mode = RUN_MODE_DEFAULT;
+//Y MOTOR PINS
+#define Y_MOTOR_ENA 2  // enables the motor
+#define Y_MOTOR_DIR 4  // determines the direction
+#define Y_MOTOR_PUL 5  // executes a step
 
 //<------------CONSTANTS------------>
 // MIN/MAX SAFE DISTANCE (mm)
@@ -55,15 +58,20 @@ int rearObjDist = 1000;
 // ACCELERATION (m/s^2)
 int accel;
 
-#define X_MOTOR_ENA 15          // enables the motor
-#define X_MOTOR_DIR 18          // determines the direction
-#define X_MOTOR_PUL 19        // executes a step
-
-#define Y_MOTOR_ENA 2          // enables the motor
-#define Y_MOTOR_DIR 4          // determines the direction
-#define Y_MOTOR_PUL 5        // executes a step
-
 const int motorPulseInterval = 350;  // interval between pulse state changes
+
+//LIDAR OBJECTS
+Adafruit_VL6180X lox1 = Adafruit_VL6180X();
+Adafruit_VL6180X lox2 = Adafruit_VL6180X();
+Adafruit_VL6180X lox3 = Adafruit_VL6180X();
+Adafruit_VL6180X lox4 = Adafruit_VL6180X();
+
+//<--------------------------------------------------->
+
+//LIDAR READ MODE
+// Setup mode for doing reads
+typedef enum { RUN_MODE_DEFAULT } runmode_t;
+runmode_t run_mode = RUN_MODE_DEFAULT;
 
 void setup() {
   Serial.begin(115200);
@@ -85,14 +93,14 @@ void setup() {
   digitalWrite(SHT_LOX4, LOW);
   Serial.println("All in reset mode...(pins are low)");
 
-  //X MOTOR SET UP 
+  //X MOTOR SET UP
   pinMode(X_MOTOR_ENA, OUTPUT);
   pinMode(X_MOTOR_DIR, OUTPUT);
   pinMode(X_MOTOR_PUL, OUTPUT);
   digitalWrite(X_MOTOR_ENA, LOW);   // enable in inverted low
   digitalWrite(X_MOTOR_PUL, HIGH);  // falling edge
 
-  //Y MOTOR SET UP 
+  //Y MOTOR SET UP
   pinMode(Y_MOTOR_ENA, OUTPUT);
   pinMode(Y_MOTOR_DIR, OUTPUT);
   pinMode(Y_MOTOR_PUL, OUTPUT);
@@ -116,7 +124,7 @@ void loop() {
       processHeadPosition();
     }
   }
-  delay(1000); //adjust this delay to change the speed of the whole system loop 
+  delay(1000);  //adjust this delay to change the speed of the whole system loop
 }
 
 void senseHeadPosition() {
@@ -378,13 +386,13 @@ void setID() {
 //Microstep: 4
 //Pulse/rev: 800
 void actuateX(bool extend, int distance) {
-  boolean motorPulseState = LOW;        // pulse state
-  int pulses = round((static_cast<float>(distance) / 60.0) * 800); //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
+  boolean motorPulseState = LOW;                                    // pulse state
+  int pulses = round((static_cast<float>(distance) / 60.0) * 800);  //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
   // Set the direction based on the extend parameter
   digitalWrite(X_MOTOR_DIR, extend ? LOW : HIGH);  // LOW for extending (CW), HIGH for retracting (CCW)
 
   for (int i = 0; i < pulses; i++) {
-    motorPulseState = !motorPulseState;            // inverts the state of the variable
+    motorPulseState = !motorPulseState;          // inverts the state of the variable
     digitalWrite(X_MOTOR_PUL, motorPulseState);  // assigns the new state to the port
     delayMicroseconds(motorPulseInterval);
   }
@@ -394,13 +402,13 @@ void actuateX(bool extend, int distance) {
 //Microstep: 4
 //Pulse/rev: 800
 void actuateY(bool extend, int distance) {
-  boolean motorPulseState = LOW;        // pulse state
-  int pulses = round((static_cast<float>(distance) / 60.0) * 800); //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
+  boolean motorPulseState = LOW;                                    // pulse state
+  int pulses = round((static_cast<float>(distance) / 60.0) * 800);  //distance (mm) * 60mm/1rev * 800 pulses/rev = pulses
   // Set the direction based on the extend parameter
   digitalWrite(Y_MOTOR_DIR, extend ? LOW : HIGH);  // LOW for extending (CW), HIGH for retracting (CCW)
 
   for (int i = 0; i < pulses; i++) {
-    motorPulseState = !motorPulseState;            // inverts the state of the variable
+    motorPulseState = !motorPulseState;          // inverts the state of the variable
     digitalWrite(Y_MOTOR_PUL, motorPulseState);  // assigns the new state to the port
     delayMicroseconds(motorPulseInterval);
   }
