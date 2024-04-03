@@ -37,28 +37,40 @@ void loop() {
   int distance = 50; //sample distance in mm
   int pulses = round((static_cast<float>(distance) / 60.0) * 1600); //formula to convert distance to pulses 
   
-  //X motor actuation 
-  digitalWrite(dirX, LOW); //set direction (LOW: CW, HIGH: CCW)
+  // //X motor actuation 
+  // digitalWrite(dirX, LOW); //set direction (LOW: CW, HIGH: CCW)
 
-  for (int i = 0; i < pulses; i++) {
-    motorpulseState = !motorpulseState;    // inverts the state of the variable
-    digitalWrite(pulX, motorpulseState);  // assigns the new state to the port
-    delayMicroseconds(motorpulseInterval);
-  }
+  // for (int i = 0; i < pulses; i++) {
+  //   motorpulseState = !motorpulseState;    // inverts the state of the variable
+  //   digitalWrite(pulX, motorpulseState);  // assigns the new state to the port
+  //   delayMicroseconds(motorpulseInterval);
+  // }
 
-  delay(1000);  // 1 second delay between movements 
+  // delay(1000);  // 1 second delay between movements 
 
-  digitalWrite(dirX, HIGH); 
+  // digitalWrite(dirX, HIGH); 
 
-  for (int i = 0; i < pulses; i++) {
-    motorpulseState = !motorpulseState;            
-    digitalWrite(pulX, motorpulseState);  
-    delayMicroseconds(motorpulseInterval);
-  }
+  // for (int i = 0; i < pulses; i++) {
+  //   motorpulseState = !motorpulseState;            
+  //   digitalWrite(pulX, motorpulseState);  
+  //   delayMicroseconds(motorpulseInterval);
+  // }
   
-  delay(1000); 
+  // delay(1000); 
 
   //Y motor actuation 
+  digitalWrite(dirY, HIGH); 
+
+  for (int i = 0; i < pulses; i++) {
+    motorpulseState = !motorpulseState;           
+    digitalWrite(pulY, motorpulseState); 
+    delayMicroseconds(motorpulseInterval);
+  }
+
+  delay(1000);
+
+  distance = 20;
+
   digitalWrite(dirY, LOW); 
 
   for (int i = 0; i < pulses; i++) {
@@ -67,15 +79,6 @@ void loop() {
     delayMicroseconds(motorpulseInterval);
   }
 
-  delay(1000);  
-
-  digitalWrite(dirY, HIGH); 
-
-  for (int i = 0; i < pulses; i++) {
-    motorpulseState = !motorpulseState;           
-    digitalWrite(pulY, motorpulseState);  
-    delayMicroseconds(motorpulseInterval);
-  }
-
   delay(1000); 
+
 }
