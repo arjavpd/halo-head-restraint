@@ -68,11 +68,6 @@ Adafruit_VL6180X lox4 = Adafruit_VL6180X();
 
 //<--------------------------------------------------->
 
-//LIDAR READ MODE
-// Setup mode for doing reads
-typedef enum { RUN_MODE_DEFAULT } runmode_t;
-runmode_t run_mode = RUN_MODE_DEFAULT;
-
 void setup() {
   Serial.begin(115200);
 
